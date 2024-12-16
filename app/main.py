@@ -1,58 +1,20 @@
-import datetime
-
 from app.cafe import Cafe
 
-from app.main import go_to_cafe
-
-friends1 = [
-    {
-        "name": "Alisa",
-        "vaccine": {
-            "expiration_date": datetime.date.today()
-        },
-        "wearing_a_mask": True
-    },
-    {
-        "name": "Bob",
-        "vaccine": {
-            "expiration_date": datetime.date.today()
-        },
-        "wearing_a_mask": True
-    },
-]
-print(go_to_cafe(friends1, Cafe("KFC")))
+from app.errors import VaccineError, NotWearingMaskError
 
 
-friends2 = [
-    {
-        "name": "Alisa",
-        "vaccine": {
-            "expiration_date": datetime.date.today()
-        },
-        "wearing_a_mask": False
-    },
-    {
-        "name": "Bob",
-        "vaccine": {
-            "expiration_date": datetime.date.today()
-        },
-        "wearing_a_mask": False
-    },
-]
-print(go_to_cafe(friends2, Cafe("KFC")))
+def go_to_cafe(friends: list, cafe: Cafe) -> str:
+    masks_to_buy = 0
 
+    for friend in friends:
+        try:
+            cafe.visit_cafe(friend)
+        except VaccineError:
+            return "All friends should be vaccinated"
+        except NotWearingMaskError:
+            masks_to_buy += 1
 
-friends3 = [
-    {
-        "name": "Alisa",
-        "wearing_a_mask": True
-    },
-    {
-        "name": "Bob",
-        "vaccine": {
-            "expiration_date": datetime.date.today()
-        },
-        "wearing_a_mask": True
-    },
-]
-print(go_to_cafe(friends3, Cafe("KFC")))
+    if masks_to_buy > 0:
+        return f"Friends should buy {masks_to_buy} masks"
+
+    return f"Friends can go to {cafe.name}"
